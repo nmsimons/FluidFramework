@@ -17,12 +17,9 @@ parameters:
 jobs:
   - ${{ each feed in parameters.feeds }}:
     - deployment: publish_${{ replace(feed.environment, '-', '_') }}
-      variables:
-        enabled: ${{ feed.enabled }} 
       displayName: Publish ${{ feed.environment }}
       pool: ${{ parameters.pool }}
       environment: ${{ feed.environment }}
-      condition: and(succeeded(), or(eq(variables['enabled'], 'release'), eq(variables['enabled'], 'prerelease')))
       workspace:
         clean: all
       strategy:
@@ -88,7 +85,7 @@ jobs:
                       t1=0
                       for f in *.tgz
                       do 
-                          if ! npm publish $f $tag
+                          if ! npm publish $f $tag ${{ feed.publishFlags }}
                           then
                               let t1+=1
                           fi
